@@ -46,8 +46,29 @@ if uploaded_file is not None:
         fig, ax = plt.subplots(figsize=(10, 6))
 
         ax.plot(timeline['time'], timeline['message'], color='green', linewidth=2, marker='o', markersize=6)
-        ax.set_xlabel("Time", fontsize=14, color="darkblue", labelpad=10, weight='bold')
-        ax.set_ylabel("Number of Messages", fontsize=14, color="darkred", labelpad=10, weight='bold')
+        # Set the background color of the plot
+        ax.set_facecolor("#F8F9F9")  # Light gray for a modern, clean look
+
+        # Set X-axis label with background color and arrow
+        ax.set_xlabel(
+            "Time →",
+            fontsize=16,
+            color="#34495E",  # Charcoal gray
+            labelpad=12,
+            weight='semibold',
+            bbox=dict(facecolor="#EAF2F8", edgecolor="none", boxstyle="round,pad=0.3")  # Light blue background
+        )
+
+        # Set Y-axis label with background color and arrow
+        ax.set_ylabel(
+            "Number of Messages →",
+            fontsize=16,
+            color="#34495E",  # Gold
+            labelpad=12,
+            weight='semibold',
+            bbox=dict(facecolor="#EAF2F8", edgecolor="none", boxstyle="round,pad=0.3")  # Light yellow background
+        )
+
         ax.set_title("Messages Over Time", fontsize=16, color="black", weight='bold', pad=15)
         ax.tick_params(axis='x', labelsize=12, rotation=45, colors="black")
         ax.tick_params(axis='y', labelsize=12, colors="black")
