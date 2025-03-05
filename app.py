@@ -226,7 +226,7 @@ if uploaded_file is not None:
             st.dataframe(emoji_df)
         with col2:
             fig, ax = plt.subplots(figsize=(6, 6))
-            # Using the new DataFrame columns "Emoji" and "Count" from helper.py
+            # Now that emoji_df has columns "Emoji" and "Count", this should work:
             ax.pie(emoji_df["Count"].head(), 
                 labels=emoji_df["Emoji"].head(), 
                 autopct="%0.2f%%", 

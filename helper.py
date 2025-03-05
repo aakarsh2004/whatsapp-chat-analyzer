@@ -107,12 +107,13 @@ def emoji_helper(selected_user, df):
     for message in df['message']:
         emojis.extend([c for c in message if c in emoji.EMOJI_DATA])
     
-    # Count emojis and create a DataFrame with column names.
+    # Count emojis and create a DataFrame with clear column names
     emoji_df = pd.DataFrame(Counter(emojis).most_common(), columns=["Emoji", "Count"])
-    # Set index to start from 1
+    # Reset index so it starts at 1
     emoji_df.index = emoji_df.index + 1
     
     return emoji_df
+
 
 def monthly_timeline(selected_user,df):
 
