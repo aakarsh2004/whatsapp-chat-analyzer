@@ -216,7 +216,7 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # emoji analysis
-        emoji_font = fm.FontProperties(family="Segoe UI Emoji", size=14)
+        emoji_font = fm.FontProperties(fname="fonts/SegoeUIEmoji.ttf", size=14)
 
         st.title("Emoji Analysis")
         emoji_df = helper.emoji_helper(selected_user, df)
@@ -226,7 +226,6 @@ if uploaded_file is not None:
             st.dataframe(emoji_df)
         with col2:
             fig, ax = plt.subplots(figsize=(6, 6))
-            # Now that emoji_df has columns "Emoji" and "Count", this should work:
             ax.pie(emoji_df["Count"].head(), 
                 labels=emoji_df["Emoji"].head(), 
                 autopct="%0.2f%%", 
@@ -235,3 +234,4 @@ if uploaded_file is not None:
             ax.axis("equal")
             fig.tight_layout()
             st.pyplot(fig)
+            
