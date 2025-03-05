@@ -23,24 +23,26 @@ if uploaded_file is not None:
 
         # Stats Area
         num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user,df)
-        st.title("Top Statistics")
-        col1, col2, col3, col4 = st.columns(4)
-    # add in future no of emojis shared 
-    #    # from when we are chatting
-        with col1:
-            st.header("Total Messages")
-            st.title(num_messages)
-        with col2:
-            st.header("Total Words")
-            st.title(words)
-        with col3:
-            st.header("Media Shared")
-            st.title(num_media_messages)
-        with col4:
-            st.header("Links Shared")
-            st.title(num_links)
+        st.markdown("<h1 style='text-align: center; color: #FFA500;'>📊 Top Statistics</h1>", unsafe_allow_html=True)
 
-        # monthly timeline    
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.markdown("<h2 style='text-align: center; color: #FF5733;'>💬 Total Messages</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: center; color: #3498DB;'>{num_messages}</h1>", unsafe_allow_html=True)
+
+        with col2:
+            st.markdown("<h2 style='text-align: center; color: #FF5733;'>📝 Total Words</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: center; color: #3498DB;'>{words}</h1>", unsafe_allow_html=True)
+
+        with col3:
+            st.markdown("<h2 style='text-align: center; color: #FF5733;'>📷 Media Shared</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: center; color: #3498DB;'>{num_media_messages}</h1>", unsafe_allow_html=True)
+
+        with col4:
+            st.markdown("<h2 style='text-align: center; color: #FF5733;'>🔗 Links Shared</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: center; color: #3498DB;'>{num_links}</h1>", unsafe_allow_html=True)
+                # monthly timeline    
         st.title("Monthly Timeline")
         timeline = helper.monthly_timeline(selected_user, df)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -79,32 +81,99 @@ if uploaded_file is not None:
        
 
         # daily timeline
-        st.title("Daily Timeline")
+        st.title("📅 Daily Timeline")
+
+        # Fetch daily timeline data
         daily_timeline = helper.daily_timeline(selected_user, df)
-        fig, ax = plt.subplots()
-        ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='black')
-        plt.xticks(rotation='vertical')
+
+        # Create a figure
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        # Plot with improved styling
+        ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='#2E86C1', linewidth=2, marker='o', markersize=6, markerfacecolor='red')
+
+        # Set background color
+        ax.set_facecolor("#F8F9F9")  # Light gray for a modern, clean look
+
+        # Set X-axis label
+        ax.set_xlabel(
+            "Date →",
+            fontsize=14,
+            color="#1C2833",  # Dark gray
+            labelpad=10,
+            weight='semibold'
+        )
+
+        # Set Y-axis label
+        ax.set_ylabel(
+            "Number of Messages →",
+            fontsize=14,
+            color="#1C2833",  
+            labelpad=10,
+            weight='semibold'
+        )
+
+        # Set title with styling
+        ax.set_title("Daily Message Trend ", fontsize=16, color="black", weight='bold', pad=15)
+
+        # Rotate x-axis labels for readability
+        ax.tick_params(axis='x', labelsize=12, rotation=45, colors="black")
+        ax.tick_params(axis='y', labelsize=12, colors="black")
+
+        # Add grid for better readability
+        ax.grid(visible=True, linestyle='--', linewidth=0.5, alpha=0.7)
+
+        # Display the plot in Streamlit
         st.pyplot(fig)
 
-        # activity map
-        st.title('Activity Map')
-        col1,col2 = st.columns(2)
 
+                # activity map
+        st.title("📍 Activity Map")
+
+        col1, col2 = st.columns(2)
+
+        # --- Most Busy Day ---
         with col1:
-            st.header("Most busy day")
-            busy_day = helper.week_activity_map(selected_user,df)
-            fig,ax = plt.subplots()
-            ax.bar(busy_day.index,busy_day.values,color='purple')
-            plt.xticks(rotation='vertical')
+            st.markdown("<h3 style='text-align: center; color: #8E44AD;'>📆 Most Busy Day</h3>", unsafe_allow_html=True)
+            
+            busy_day = helper.week_activity_map(selected_user, df)
+            fig, ax = plt.subplots(figsize=(6, 4))
+            
+            ax.bar(busy_day.index, busy_day.values, color='#8E44AD', alpha=0.85, edgecolor='black', linewidth=1.2)
+            
+            ax.set_facecolor("#F8F9F9")
+            ax.set_xlabel("Day of the Week", fontsize=12, weight='bold', color="#2C3E50")
+            ax.set_ylabel("Message Count", fontsize=12, weight='bold', color="#2C3E50")
+            ax.set_title("Messages per Day", fontsize=14, weight='bold', color="black")
+            
+            ax.tick_params(axis='x', labelsize=11, rotation=45, colors="black")
+            ax.tick_params(axis='y', labelsize=11, colors="black")
+            
+            ax.grid(axis='y', linestyle="--", linewidth=0.6, alpha=0.7)
+            
             st.pyplot(fig)
 
+        # --- Most Busy Month ---
         with col2:
-            st.header("Most busy month")
+            st.markdown("<h3 style='text-align: center; color: #E67E22;'>📅 Most Busy Month</h3>", unsafe_allow_html=True)
+            
             busy_month = helper.month_activity_map(selected_user, df)
-            fig, ax = plt.subplots()
-            ax.bar(busy_month.index, busy_month.values,color='orange')
-            plt.xticks(rotation='vertical')
+            fig, ax = plt.subplots(figsize=(6, 4))
+            
+            ax.bar(busy_month.index, busy_month.values, color='#E67E22', alpha=0.85, edgecolor='black', linewidth=1.2)
+            
+            ax.set_facecolor("#F8F9F9")
+            ax.set_xlabel("Month", fontsize=12, weight='bold', color="#2C3E50")
+            ax.set_ylabel("Message Count", fontsize=12, weight='bold', color="#2C3E50")
+            ax.set_title("Messages per Month", fontsize=14, weight='bold', color="black")
+            
+            ax.tick_params(axis='x', labelsize=11, rotation=45, colors="black")
+            ax.tick_params(axis='y', labelsize=11, colors="black")
+            
+            ax.grid(axis='y', linestyle="--", linewidth=0.6, alpha=0.7)
+            
             st.pyplot(fig)
+
 
         st.title("Weekly Activity Map")
         user_heatmap = helper.activity_heatmap(selected_user,df)
