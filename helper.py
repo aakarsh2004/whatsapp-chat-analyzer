@@ -4,6 +4,7 @@ from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
 import emoji
+import re
 
 extract = URLExtract()
 
@@ -31,10 +32,17 @@ def fetch_stats(selected_user,df):
     return num_messages,len(words),num_media_messages,len(links)
 
 def most_busy_users(df):
-    x = df['user'].value_counts().head()
-    df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index().rename(
-        columns={'index': 'name', 'user': 'percent'})
-    return x,df
+    # Remove group notifications
+    df_clean = df[df['user'] != 'group_notification']
+    
+    # Get the top users by message count
+    x = df_clean['user'].value_counts().head()
+    
+    # Calculate percentage contribution of each user
+    df_percent = round((df_clean['user'].value_counts() / df_clean.shape[0]) * 100, 2).reset_index().rename(
+        columns={'index': 'name', 'user': 'percent'}
+    )
+    return x, df_percent
 
 def create_wordcloud(selected_user,df):
 
@@ -59,40 +67,51 @@ def create_wordcloud(selected_user,df):
     df_wc = wc.generate(temp['message'].str.cat(sep=" "))
     return df_wc
 
-def most_common_words(selected_user,df):
-
-    f = open('stop_hinglish.txt','r')
-    stop_words = f.read()
-
+def most_common_words(selected_user, df):
+    """
+    Returns a DataFrame containing the 20 most common words in the chat,
+    excluding stop words and other unnecessary tokens.
+    """
+    # Load stop words and convert them to a set for fast lookup
+    with open('stop_hinglish.txt', 'r') as f:
+        stop_words = set(f.read().split())
+    
+    # Filter out group notifications and media messages
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
-
-    temp = df[df['user'] != 'group_notification']
-    temp = temp[temp['message'] != '<Media omitted>\n']
-
+    temp = df[(df['user'] != 'group_notification') & (df['message'] != '<Media omitted>\n')]
+    
     words = []
-
     for message in temp['message']:
-        for word in message.lower().split():
-            if word not in stop_words:
-                words.append(word)
-
+        # Extract words using regex (removes punctuation and numbers)
+        message_words = re.findall(r'\b[a-z]+\b', message.lower())
+        # Filter out stop words and very short words
+        filtered_words = [word for word in message_words if word not in stop_words and len(word) > 1]
+        words.extend(filtered_words)
+    
     most_common_df = pd.DataFrame(Counter(words).most_common(20))
     return most_common_df
 
 def emoji_helper(selected_user, df):
+    """
+    Analyze and count emojis used in the chat.
+    
+    Returns:
+      A DataFrame of emojis and their frequencies with columns "Emoji" and "Count"
+      and the index starting from 1.
+    """
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
-
+    
     emojis = []
-    # Iterate through messages and check for emojis in each message
     for message in df['message']:
-        # Use emoji_data from the new version (EMOJI_DATA contains emoji details)
         emojis.extend([c for c in message if c in emoji.EMOJI_DATA])
-
-    # Count the most common emojis
-    emoji_df = pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))
-
+    
+    # Count emojis and create a DataFrame with column names.
+    emoji_df = pd.DataFrame(Counter(emojis).most_common(), columns=["Emoji", "Count"])
+    # Set index to start from 1
+    emoji_df.index = emoji_df.index + 1
+    
     return emoji_df
 
 def monthly_timeline(selected_user,df):
